@@ -4,7 +4,12 @@ from __future__ import unicode_literals
 class UserManager(models.Manager):
     def create_validator(self, reqPost):   
         errors = {}
-        if len(reqPost['user_name'])
+        if len(reqPost['user_name'])<5:
+            errors['username'] = "Name must be at least 5 characters"
+        if len(reqPost['email'])<8:
+            errors['email'] = "Email must be at least 8 characters"
+        if len(reqPost['password'])<8:
+            errors['password'] = "Password must be at least 8 characters"
         return errors
 
 class User(models.Model):
