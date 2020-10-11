@@ -16,5 +16,13 @@ def register(request):
                 messages.error(request, value)
             return redirect('/')
         else:
-            pass
+            
+            
+            # include some logic to validate user input before adding them to the database!
+            password = request.POST['password']
+            pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()  # create the hash    
+            print(pw_hash)      # prints something like b'$2b$12$sqjyok5RQccl9S6eFLhEPuaRaJCcH3Esl2RWLm/cimMIEnhnLb7iC'    
+            # be sure you set up your database so it can store password hashes this long (60 characters)
+            # make sure you put the hashed password in the database, not the one from the form!
+            User.objects.create(name=request.POST['user_name'], password=pw_hash, email=request.POST['email'], ) 
             #Create an account
