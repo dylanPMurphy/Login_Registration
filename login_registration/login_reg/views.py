@@ -30,3 +30,37 @@ def register(request):
 
 def reg_success(request):
     return render(request, 'successful_REG.html')
+
+
+def login(request):
+    if request.method =="POST":
+        user = User.objects.filter(name=request.POST['login_uname']) # why are we using filter here instead of get?
+        if user and request.POST['login_pass']: # note that we take advantage of truthiness here: an empty list will return false
+            logged_user = user[0] 
+            # assuming we only have one user with this username, the user would be first in the list we get back
+            # of course, we should have some logic to prevent duplicates of usernames when we create users
+            # use bcrypt's check_password_hash method, passing the hash from our database and the password from the form
+            if bcrypt.checkpw(request.POST['login_pass'].encode(), logged_user.password.encode()):
+                # if we get True after checking the password, we may put the user id in session
+                request.session['userid'] = logged_user.id
+                # never render on a post, always redirect!
+                return redirect('/success')
+            else:
+                messages.error(request, "Username or password incorrect")
+                return redirect('/')
+        else:
+            messages.error(request, "Username or password incorrect")
+            return redirect('/')
+
+def success(request):
+
+    context = {
+
+    
+        'session_user':User.objects.get(id=request.session['userid'])
+    }
+    return render(request, 'successful_LOGIN.html', context)
+
+def logout(request):
+    request.session.flush()
+    return redirect('/')
